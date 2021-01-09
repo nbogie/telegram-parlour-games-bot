@@ -1,3 +1,5 @@
+const { Telegraf, session } = require('telegraf')
+
 //import { DiceRoller } from 'rpg-dice-roller';
 const rpgDiceRoller = require('rpg-dice-roller');
 const categories = require("./categories.json");
@@ -5,7 +7,6 @@ const emotions = require("./emotions.json");
 const customers = require("./salesman/customers.json");
 const things = require("./salesman/things.json");
 const lodash = require("lodash");
-const { Telegraf } = require('telegraf')
 require('dotenv').config()
 
 const diceDescriptionString = '4d6';
@@ -14,7 +15,11 @@ const roll = new rpgDiceRoller.DiceRoll(diceDescriptionString);
 console.log(roll.total);
 console.log(roll.output);
 
+
+
 const bot = new Telegraf(process.env.BOT_TOKEN)
+bot.use(session());
+
 bot.start((ctx) => ctx.reply('Welcome'))
 bot.help((ctx) => ctx.reply('Send me a sticker'))
 bot.on('sticker', (ctx) => ctx.reply('👍'))
@@ -27,6 +32,14 @@ bot.command('roll', (ctx) => {
     const roll = new rpgDiceRoller.DiceRoll(diceDescriptionString);
     ctx.reply(roll.output)
 })
+
+bot.command('count', (ctx => {
+    if (!ctx.session || ctx.session.counter === undefined) {
+        ctx.session = { counter: 0 };
+    }
+    ctx.session.counter++
+    ctx.reply(`${ctx.session.counter}`)
+}))
 
 bot.command('whonext', (ctx) => {
     const who = pick(["neill", "andy", "jon", "pankaj"]);
