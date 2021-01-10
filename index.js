@@ -1,23 +1,16 @@
 const { Telegraf, session } = require('telegraf')
+const lodash = require("lodash");
+require('dotenv').config()
 
-//import { DiceRoller } from 'rpg-dice-roller';
 const rpgDiceRoller = require('rpg-dice-roller');
+
 const categories = require("./categories.json");
 const emotions = require("./emotions.json");
 const customers = require("./salesman/customers.json");
 const things = require("./salesman/things.json");
-const lodash = require("lodash");
-require('dotenv').config()
-
-const diceDescriptionString = '4d6';
-
-const roll = new rpgDiceRoller.DiceRoll(diceDescriptionString);
-console.log(roll.total);
-console.log(roll.output);
-
-
 
 const bot = new Telegraf(process.env.BOT_TOKEN)
+
 bot.use(session());
 
 bot.start((ctx) => ctx.reply('Welcome'))
@@ -29,8 +22,23 @@ bot.command('oldschool', (ctx) => ctx.reply('Hello'))
 bot.command('hipster', Telegraf.reply('λ'))
 
 bot.command('roll', (ctx) => {
-    const roll = new rpgDiceRoller.DiceRoll(diceDescriptionString);
-    ctx.reply(roll.output)
+    //https://greenimp.github.io/rpg-dice-roller/guide/notation/
+    const parts = ctx.message.text.split(" ");
+    if (parts.length > 1 && parts[1].length < 20) {
+        try {
+            const roll = new rpgDiceRoller.DiceRoll(parts[1]);
+            ctx.reply(roll.output)
+        } catch (err) {
+            ctx.reply("??")
+        }
+    }
+    else {
+        ctx.reply("Example: /roll 2d8+2");
+    }
+})
+
+bot.command('wait', (ctx) => {
+    setTimeout(() => ctx.reply("i waited!"), 5000)
 })
 
 bot.command('count', (ctx => {
@@ -68,8 +76,6 @@ const randomPhoto = 'https://picsum.photos/200/300/?random'
 bot.command('photo', ({ replyWithPhoto }) =>
     replyWithPhoto({ url: randomPhoto })
 )
-
-bot.command('wizard', (ctx) => Telegraf.reply("Neill?"));
 
 bot.launch()
 
