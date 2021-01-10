@@ -37,8 +37,27 @@ bot.command('roll', (ctx) => {
     }
 })
 
-bot.command('wait', (ctx) => {
-    setTimeout(() => ctx.reply("i waited!"), 5000)
+bot.command('timer', (ctx) => {
+    const parts = ctx.message.text.split(" ");
+    const usageExample = "Try '/timer 30' for a 30-second timer.";
+    if (parts.length < 1) {
+        return ctx.reply(usageExample);
+    }
+    const timeSec = parseInt(parts[1]);
+    if (timeSec < 1 || timeSec > 300) {
+        return ctx.reply("That's just for short timers")
+    }
+
+    setTimeout(() => ctx.replyWithMarkdown(":stopwatch _Brrrrrrinnng!  Time's up!_"), timeSec * 1000);
+})
+
+bot.command('dicetest', (ctx) => {
+    return ctx.replyWithDice()
+})
+
+bot.command('maptest', (ctx) => {
+    // return ctx.reply("ok");
+    return ctx.replyWithLocation("51.5138453", "-0.1005393");
 })
 
 bot.command('count', (ctx => {
